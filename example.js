@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 
 let db;
 
-awaitMySqlWithInquirer();
+promptUser();
 
 async function init() {
   db = await mysql.createConnection(
@@ -17,7 +17,7 @@ async function init() {
   );
 }
 
-async function awaitMySqlWithInquirer() {
+async function promptUser() {
   await init()
 
   const [employees] = await db.execute("select * from employee")
