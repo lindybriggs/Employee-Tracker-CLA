@@ -45,6 +45,8 @@ async function promptUser() {
         addRole(departments);
     } else if (option === 'Add an employee') {
         addEmployeePrompt(roles, employees);
+    } else {
+        updateEmployeePrompt();
     }
 
 }
@@ -145,9 +147,9 @@ async function addEmployeePrompt(roles, employees) {
     ])
 
     const { firstName, lastName, role, manager } = response
-    console.log(firstName);
-    console.log(lastName);
-    console.log(role.id);
+    // console.log(firstName);
+    // console.log(lastName);
+    // console.log(role.id);
     // console.log(firstName, lastName, role, manager);
     addEmployee(firstName, lastName, role, manager)
 
@@ -163,6 +165,45 @@ async function addEmployeePrompt(roles, employees) {
         console.log(`Added employee named ${employeeFN} ${employeeLS}.`);
 
         const [employees] = await db.execute("select * from employee")
+        console.table(employees);
+    }
+}
+
+
+async function updateEmployeePrompt() {
+    const [roles] = await db.execute("select * from role")
+    const [employees] = await db.execute("select * from employee")
+    const response = await prompt([
+        {
+            type: 'list',
+            name: 'employee',
+            message: 'Which employee do you want to update?',
+            choices: employees.map(employee => ({ name: employee.first_name + " " + employee.last_name, value: employee }))
+        },
+        {
+            type: 'list',
+            name: 'role',
+            message: 'What is their new role?',
+            choices: roles.map(role => ({ name: role.title, value: role }))
+        },
+    ])
+
+    const { employee, role } = response
+    console.log(employee, role);
+    updateRole(employee, role)
+
+    async function updateRole(employee, role) {
+        const employeeName = employee.first_name;
+        const roleTitle = role.title;
+        const employeeId = employee.id;
+        const newRole = role.id;
+
+        let query = 'UPDATE employee SET role_id=? where id=?;';
+        let args = [newRole, employeeId];
+        const help = await db.query(query, args);
+        console.log(`Updated ${employeeName}'s role to ${roleTitle}`);
+
+        const [employees] = await db.execute("SELECT employee.first_name, employee.last_name, role.title FROM role JOIN employee ON role.id = employee.role_id;")
         console.table(employees);
     }
 }
