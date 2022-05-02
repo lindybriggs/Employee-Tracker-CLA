@@ -42,11 +42,14 @@ async function promptUser() {
     } else if (option === 'Add a department') {
         addDepartment();
     } else if (option === 'Add a role') {
-        addRole(departments, roles);
+        addRole(departments);
+    } else if (option === 'Add an employee') {
+        addEmployeePrompt(roles, employees);
     }
 
 }
-
+// WHEN I choose to add a department
+// THEN I am prompted to enter the name of the department and that department is added to the database
 async function addDepartment() {
     const { newDepartment } = await prompt([{
         type: 'input',
@@ -67,8 +70,9 @@ async function addDepartment() {
     }
 
 }
-
-async function addRole(departments, roles) {
+// WHEN I choose to add a role
+// THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
+async function addRole(departments) {
     // const [currentDepartments] = await db.execute("select * from department")
 
     const response = await prompt([
@@ -89,23 +93,76 @@ async function addRole(departments, roles) {
             choices: departments.map(department => ({ name: department.name, value: department }))
         },
     ])
-    
+
     // console.log(title);
     // console.log(salary);
     // console.log(department.name);
     const { title, salary, department } = response
-    console.log( title, salary, department );
+    console.log(title, salary, department);
     addRole(title, salary, department)
 
     async function addRole(title, salary, department) {
         const roleTitle = title;
         const roleSalary = salary;
         const roleDepartment = department.id;
+
         let query = 'INSERT into role (title, salary, department_id) VALUES (?, ?, ?)';
         let args = [roleTitle, roleSalary, roleDepartment];
         const help = await db.query(query, args);
         console.log(`Added role titled ${roleTitle} with salary of ${roleSalary}`);
+
         const [roles] = await db.execute("select * from role")
         console.table(roles);
+    }
+}
+
+// WHEN I choose to add an employee
+// THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
+async function addEmployeePrompt(roles, employees) {
+    const response = await prompt([
+        {
+            type: 'input',
+            name: 'firstName',
+            message: `Enter the new employee's first name.`,
+        },
+        {
+            type: 'input',
+            name: 'lastName',
+            message: `Enter the new employee's last name.`,
+        },
+        {
+            type: 'list',
+            name: 'role',
+            message: `Choose the new employee's role.`,
+            choices: roles.map(role => ({ name: role.title, value: role }))
+        },
+        {
+            type: 'list',
+            name: 'manager',
+            message: `Who is the new employee's manager?`,
+            choices: employees.map(employee => ({ name: employee.first_name + " " + employee.last_name, value: employee }))
+        },
+    ])
+
+    const { firstName, lastName, role, manager } = response
+    console.log(firstName);
+    console.log(lastName);
+    console.log(role.id);
+    // console.log(firstName, lastName, role, manager);
+    addEmployee(firstName, lastName, role, manager)
+
+    async function addEmployee(firstName, lastName, role, manager) {
+        const employeeFN = firstName;
+        const employeeLS = lastName;
+        const employeeRole = role.id;
+        const employeeManager = manager.id
+
+        let query = 'INSERT into employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)';
+        let args = [employeeFN, employeeLS, employeeRole, employeeManager];
+        const help = await db.query(query, args);
+        console.log(`Added employee named ${employeeFN} ${employeeLS}.`);
+
+        const [employees] = await db.execute("select * from employee")
+        console.table(employees);
     }
 }
