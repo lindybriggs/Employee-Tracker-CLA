@@ -22,7 +22,7 @@ async function promptUser() {
     await init()
 
     const [departments] = await db.execute("select * from department")
-    const [roles] = await db.execute("select * from role")
+    const [roles] = await db.execute("SELECT department.name, role.title, role.id, role.salary FROM role JOIN department ON role.department_id = department.id;")
     const [employees] = await db.execute("SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, department.name, role.title, role.salary FROM ((employee INNER JOIN role ON role_id = role.id) INNER JOIN department ON department_id = department.id);")
 
     const { option } = await prompt([{
@@ -36,10 +36,13 @@ async function promptUser() {
 
     if (option === 'View all departments') {
         console.table(departments)
+        promptUser();
     } else if (option === 'View all roles') {
         console.table(roles)
+        promptUser();
     } else if (option === 'View all employees') {
         console.table(employees)
+        promptUser();
     } else if (option === 'Add a department') {
         addDepartment();
     } else if (option === 'Add a role') {
@@ -110,7 +113,7 @@ async function addRole(departments) {
     const help = await db.query(query, args);
     console.log(`Added role titled ${roleTitle} with salary of ${roleSalary}`);
 
-    const [roles] = await db.execute("select * from role")
+    const [roles] = await db.execute("SELECT department.name, role.title, role.id, role.salary FROM role JOIN department ON role.department_id = department.id;")
     console.table(roles);
 
     promptUser();
