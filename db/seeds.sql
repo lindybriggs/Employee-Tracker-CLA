@@ -11,13 +11,13 @@ VALUES  ("Software Engineer", 100000.00, 1),
         ("Lead Engineer", 150000.00, 1),
         ("Sales Lead", 120000, 3);
 
-INSERT INTO employee (first_name, last_name, role_id)
-VALUES  ("Dylan", "Green", 5),
-        ("Sydney", "Sheppard", 4),
-        ("Alex", "Fields", 6);
-
 -- INSERT INTO employee (first_name, last_name, role_id, manager_id)
--- VALUES  ("Kelly", "Smith", 1, 1),
---         ("Dylan", "Green", 3, 6),
---         ("Michelle", "Collilns", 2, 4),
---         ("Sydney", "Sheppard", 1, 1);
+-- VALUES  ("Dylan", "Green", 5, 1),
+--         ("Sydney", "Sheppard", 1, 1),
+--         ("Alex", "Fields", 6, 3);
+
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES  ("Kelly", "Smith", 1, 1),
+        ("Dylan", "Green", 3, 6),
+        ("Michelle", "Collilns", 2, 4),
+        ("Sydney", "Sheppard", 1, 1);

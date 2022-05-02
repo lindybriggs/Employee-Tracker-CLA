@@ -21,9 +21,18 @@ async function init() {
 async function promptUser() {
     await init()
 
-    const [departments] = await db.execute("select * from department")
+    const [departments] = await db.execute("select department.id, department.name from department")
     const [roles] = await db.execute("SELECT department.name, role.title, role.id, role.salary FROM role JOIN department ON role.department_id = department.id;")
-    const [employees] = await db.execute("SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, department.name, role.title, role.salary FROM ((employee INNER JOIN role ON role_id = role.id) INNER JOIN department ON department_id = department.id);")
+    const [employees] = await db.execute(`select employee.id, employee.first_name, employee.last_name, role.title as roleTitle, department.name as departmentName, role.salary, manager.first_name AS managerName
+    from (
+    (employee INNER JOIN role ON role_id = role.id)
+    inner join 
+    (select * from employee) as manager
+    on manager.id = employee.manager_id
+    INNER JOIN 
+    department 
+    ON department_id = department.id
+    );`)
 
     const { option } = await prompt([{
         type: 'list',
