@@ -30,11 +30,11 @@ async function promptUser() {
 // THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
     const [employees] = await db.execute(`select employee.id, employee.first_name, employee.last_name, role.title as roleTitle, department.name as departmentName, role.salary, manager.first_name AS managerName
     from (
-    (employee INNER JOIN role ON role_id = role.id)
-    inner join 
+    (employee JOIN role ON role_id = role.id)
+    left join 
     (select * from employee) as manager
     on manager.id = employee.manager_id
-    INNER JOIN 
+    JOIN 
     department 
     ON department_id = department.id
     );`)
